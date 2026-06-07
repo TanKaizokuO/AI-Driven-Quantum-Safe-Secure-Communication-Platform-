@@ -1,0 +1,76 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-cyber-bg: #0a0f1e;
+  --color-cyber-card: #111a33;
+  --color-cyber-border: #1e2d5a;
+  --color-cyber-accent: #00ff9d;
+  --color-cyber-accent-blue: #00e5ff;
+  --color-cyber-accent-red: #ff3b30;
+  --color-cyber-accent-yellow: #ffcc00;
+  --color-cyber-text-primary: #f8fafc;
+  --color-cyber-text-secondary: #94a3b8;
+  --color-cyber-text-muted: #64748b;
+}
+
+:root {
+  --background: #0a0f1e;
+  --foreground: #f8fafc;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  overflow-x: hidden;
+}
+
+/* Custom cyber grid background */
+.cyber-grid {
+  background-size: 40px 40px;
+  background-image: 
+    linear-gradient(to right, rgba(30, 45, 90, 0.2) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(30, 45, 90, 0.2) 1px, transparent 1px);
+}
+
+.glow-accent {
+  box-shadow: 0 0 15px rgba(0, 255, 157, 0.2);
+}
+
+.glow-accent-blue {
+  box-shadow: 0 0 15px rgba(0, 229, 255, 0.2);
+}
+
+/* Animations */
+@keyframes scanline {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(100%);
+  }
+}
+
+.scanline::after {
+  content: " ";
+  display: block;
+  position: absolute;
+  top: 0; left: 0; bottom: 0; right: 0;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 255, 157, 0.1) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+  z-index: 10;
+  background-size: 100% 2px, 3px 100%;
+  pointer-events: none;
+}
+
+@keyframes pulse-slow {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.pulse-slow {
+  animation: pulse-slow 3s infinite ease-in-out;
+}
