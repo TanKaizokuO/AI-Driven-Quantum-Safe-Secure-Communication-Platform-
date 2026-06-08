@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cryptographic Mathematics | Quantum-Safe Core</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;600&family=Inter:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- MathJax for rendering LaTeX -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        :root {
+            --bg-color: #0a0a0f;
+            --surface: rgba(20, 20, 30, 0.6);
+            --surface-hover: rgba(30, 30, 45, 0.8);
+            --border: rgba(100, 150, 255, 0.15);
+            --border-highlight: rgba(100, 150, 255, 0.4);
+            --text-primary: #e2e8f0;
+            --text-secondary: #94a3b8;
+            --accent-cyan: #06b6d4;
+            --accent-purple: #8b5cf6;
+            --accent-glow: rgba(6, 182, 212, 0.5);
+            --math-color: #38bdf8;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            line-height: 1.7;
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(6, 182, 212, 0.04), transparent 50%),
+                radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.04), transparent 50%),
+                linear-gradient(to bottom, transparent, rgba(0,0,0,0.8));
+            background-attachment: fixed;
+            min-height: 100vh;
+        }
+
+        /* Ambient animated background dots */
+        .bg-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+            background-size: 30px 30px;
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 5rem;
+            position: relative;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 1rem;
+            background: rgba(6, 182, 212, 0.1);
+            color: var(--accent-cyan);
+            border: 1px solid rgba(6, 182, 212, 0.2);
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 1.5rem;
+            backdrop-filter: blur(4px);
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin: 0;
+            background: linear-gradient(to right, #fff, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.02em;
+        }
+
+        h1 span {
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        header p {
+            color: var(--text-secondary);
+            font-size: 1.25rem;
+            max-width: 600px;
+            margin: 1.5rem auto 0;
+        }
+
+        .section {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 3rem;
+            margin-bottom: 3rem;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+        }
+
+        .section:hover {
+            transform: translateY(-5px);
+            border-color: var(--border-highlight);
+            box-shadow: 0 30px 60px -12px rgba(6, 182, 212, 0.1);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .section-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .section-icon svg {
+            width: 24px;
+            height: 24px;
+            stroke: var(--accent-cyan);
+            stroke-width: 1.5;
+        }
+
+        h2 {
+            font-size: 1.875rem;
+            font-weight: 600;
+            margin: 0;
+            color: #fff;
+        }
+
+        .math-block {
+            background: rgba(0, 0, 0, 0.4);
+            border-left: 3px solid var(--accent-cyan);
+            padding: 1.5rem;
+            border-radius: 0 12px 12px 0;
+            margin: 2rem 0;
+            font-size: 1.1rem;
+            color: var(--math-color);
+            overflow-x: auto;
+        }
+
+        .math-inline {
+            color: var(--math-color);
+            background: rgba(0,0,0,0.2);
+            padding: 0 0.25rem;
+            border-radius: 4px;
+        }
+
+        p {
+            margin-bottom: 1.5rem;
+        }
+
+        .code-font {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9em;
+            color: var(--accent-purple);
+            background: rgba(139, 92, 246, 0.1);
+            padding: 0.2em 0.4em;
+            border-radius: 4px;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        @media (min-width: 768px) {
+            .grid-2 {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .info-card {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.05);
+            padding: 1.5rem;
+            border-radius: 16px;
+        }
+
+        .info-card h3 {
+            margin-top: 0;
+            color: #fff;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .info-card h3 svg {
+            width: 18px;
+            height: 18px;
+            stroke: var(--accent-purple);
+        }
+
+        ul {
+            padding-left: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+        }
+
+        li strong {
+            color: var(--text-primary);
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-color);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.1);
+            border-radius: 5px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255,255,255,0.2);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg-grid"></div>
+
+    <div class="container">
+        <header>
+            <div class="badge">Mathematical Core</div>
+            <h1>Cryptographic <span>Mathematics</span></h1>
+            <p>A deep dive into the underlying theoretical frameworks of the Hybrid Quantum-Safe Secure Communication Platform.</p>
+        </header>
+
+        <!-- Classical: X25519 -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                    </svg>
+                </div>
+                <h2>Classical: X25519 (Elliptic Curve)</h2>
+            </div>
+            
+            <p>X25519 uses <strong>Elliptic Curve Diffie-Hellman (ECDH)</strong> over Curve25519. It relies on the computational difficulty of the Elliptic Curve Discrete Logarithm Problem (ECDLP).</p>
+            
+            <p>The curve is defined over a prime field <span class="math-inline">\(\mathbb{F}_p\)</span> by the Montgomery equation:</p>
+            
+            <div class="math-block">
+                \[ y^2 = x^3 + 486662x^2 + x \pmod p \]
+            </div>
+
+            <p>Where the prime <span class="math-inline">\(p\)</span> is defined as:</p>
+
+            <div class="math-block">
+                \[ p = 2^{255} - 19 \]
+            </div>
+
+            <div class="grid-2">
+                <div class="info-card">
+                    <h3>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                        Key Exchange Mechanism
+                    </h3>
+                    <p>Alice and Bob agree on a base point <span class="math-inline">\(G\)</span>. They choose private keys <span class="math-inline">\(a\)</span> and <span class="math-inline">\(b\)</span>, generating public keys <span class="math-inline">\(A = aG\)</span> and <span class="math-inline">\(B = bG\)</span>.</p>
+                    <p>The shared secret <span class="math-inline">\(K\)</span> is computed as:</p>
+                    <div class="math-inline" style="padding: 10px; display: inline-block; margin-top: 10px;">
+                        \[ K = aB = a(bG) = b(aG) = bA \]
+                    </div>
+                </div>
+                <div class="info-card">
+                    <h3>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                        Vulnerability
+                    </h3>
+                    <p>While extremely fast (~1ms), ECDLP can be solved in polynomial time by a sufficiently large quantum computer using <strong>Shor's Algorithm</strong>, making it vulnerable to "Store-Now-Decrypt-Later" attacks.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Post-Quantum: ML-KEM-768 -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                        <polyline points="2 17 12 22 22 17"></polyline>
+                        <polyline points="2 12 12 17 22 12"></polyline>
+                    </svg>
+                </div>
+                <h2>Post-Quantum: ML-KEM-768 (Lattice-Based)</h2>
+            </div>
+            
+            <p>ML-KEM-768 (formerly CRYSTALS-Kyber) is standardized by NIST (FIPS 203). It is based on the hard problem of <strong>Module Learning with Errors (M-LWE)</strong> over polynomial rings.</p>
+
+            <p>Let <span class="math-inline">\(R_q = \mathbb{Z}_q[X]/(X^n + 1)\)</span> be a polynomial ring where <span class="math-inline">\(n = 256\)</span> and the modulus <span class="math-inline">\(q = 3329\)</span>. For ML-KEM-768, we work with vectors/matrices of dimension <span class="math-inline">\(k = 3\)</span> over <span class="math-inline">\(R_q\)</span>.</p>
+            
+            <p>The core mathematical relationship (the public key generation) is:</p>
+            
+            <div class="math-block">
+                \[ \mathbf{t} = \mathbf{A} \cdot \mathbf{s} + \mathbf{e} \pmod q \]
+            </div>
+
+            <ul>
+                <li><strong>A</strong>: A randomly generated <span class="math-inline">\(k \times k\)</span> matrix in <span class="math-inline">\(R_q\)</span>.</li>
+                <li><strong>s</strong>: The secret key vector of size <span class="math-inline">\(k\)</span>, sampled from a centered binomial distribution (small coefficients).</li>
+                <li><strong>e</strong>: An error vector of size <span class="math-inline">\(k\)</span>, also sampled from a binomial distribution.</li>
+                <li><strong>t</strong>: The resulting public key vector.</li>
+            </ul>
+
+            <div class="grid-2">
+                <div class="info-card">
+                    <h3>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                        Security Premise
+                    </h3>
+                    <p>The security relies on the premise that given <span class="math-inline">\(\mathbf{A}\)</span> and <span class="math-inline">\(\mathbf{t}\)</span>, it is computationally intractable (even for quantum computers) to recover the secret <span class="math-inline">\(\mathbf{s}\)</span> due to the deliberate addition of the small error <span class="math-inline">\(\mathbf{e}\)</span>.</p>
+                </div>
+                <div class="info-card">
+                    <h3>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+                        Encapsulation
+                    </h3>
+                    <p>During encapsulation, the sender generates a random message <span class="math-inline">\(m\)</span>, an ephemeral secret <span class="math-inline">\(\mathbf{r}\)</span>, and errors <span class="math-inline">\(\mathbf{e_1}\)</span>, <span class="math-inline">\(e_2\)</span>. The ciphertext consists of <span class="math-inline">\((\mathbf{u}, v)\)</span>:</p>
+                    <div class="math-inline" style="padding: 10px; display: inline-block; margin-top: 10px;">
+                        \[ \mathbf{u} = \mathbf{A}^T\mathbf{r} + \mathbf{e_1} \]
+                        \[ v = \mathbf{t}^T\mathbf{r} + e_2 + \lfloor q/2 \rceil \cdot m \]
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hybrid Derivation: HKDF -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                        <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                        <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                    </svg>
+                </div>
+                <h2>Hybrid Combining: HKDF-SHA256</h2>
+            </div>
+            
+            <p>To ensure resilience, the secrets from both X25519 (<span class="math-inline">\(S_{ECC}\)</span>) and ML-KEM-768 (<span class="math-inline">\(S_{PQC}\)</span>) are concatenated and fed into an HMAC-based Key Derivation Function (HKDF).</p>
+
+            <p><strong>1. Extract Phase:</strong> Generates a fixed-length pseudorandom key (PRK).</p>
+            <div class="math-block">
+                \[ PRK = \text{HMAC-Hash}(\text{salt}, S_{ECC} \Vert S_{PQC}) \]
+            </div>
+
+            <p><strong>2. Expand Phase:</strong> Derives the final 256-bit symmetric session key.</p>
+            <div class="math-block">
+                \[ Key_{session} = \text{HMAC-Hash}(PRK, \text{info} \Vert \text{0x01}) \]
+            </div>
+            
+            <p>Because HKDF is a one-way function, an attacker must break <strong>both</strong> the classical ECDLP and the post-quantum M-LWE problem to recover the session key. If ML-KEM-768 has an unforeseen mathematical vulnerability, X25519 still protects the channel against classical attacks.</p>
+        </div>
+
+        <!-- Symmetric: AES-256-GCM -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                    </svg>
+                </div>
+                <h2>Symmetric Encryption: AES-256-GCM</h2>
+            </div>
+            
+            <p>Once the hybrid handshake generates the session key, real-time WebSocket messages are encrypted client-side using <strong>Advanced Encryption Standard (AES)</strong> in <strong>Galois/Counter Mode (GCM)</strong>.</p>
+
+            <p>GCM provides both confidentiality and data origin authentication (AEAD).</p>
+
+            <p><strong>Encryption (Counter Mode):</strong></p>
+            <div class="math-block">
+                \[ C_i = P_i \oplus E_K(CB_i) \]
+            </div>
+            <p>Where <span class="math-inline">\(P_i\)</span> is plaintext block <span class="math-inline">\(i\)</span>, <span class="math-inline">\(E_K\)</span> is AES encryption with the session key, and <span class="math-inline">\(CB_i\)</span> is the counter block generated from the 12-byte Initialization Vector (IV).</p>
+
+            <p><strong>Authentication (Galois Hash):</strong></p>
+            <p>GCM computes an authentication tag <span class="math-inline">\(T\)</span> by evaluating a polynomial over the Galois field <span class="math-inline">\(GF(2^{128})\)</span>. The ciphertext blocks and any Additional Authenticated Data (AAD) form the coefficients of this polynomial, which is evaluated at a hash subkey <span class="math-inline">\(H = E_K(0^{128})\)</span>.</p>
+            
+            <div class="math-block">
+                \[ T = (\text{GHASH}_H(A, C) \oplus E_K(CB_0)) \]
+            </div>
+
+            <p>This 16-byte tag ensures that any tampering with the ciphertext in transit across the WebSocket relay is immediately detected, causing the decryption to fail.</p>
+        </div>
+
+    </div>
+
+</body>
+</html>
