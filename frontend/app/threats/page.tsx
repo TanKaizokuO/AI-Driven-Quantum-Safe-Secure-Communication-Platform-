@@ -55,7 +55,11 @@ export default function Threats() {
   // AI Typing Effect state
   const [assessmentText, setAssessmentText] = useState('');
   const [typingIndex, setTypingIndex] = useState(0);
-  const targetAssessment = "Potential brute force campaign detected. Attack pattern resembles credential stuffing behavior. Recommend immediate hybrid key rotation.";
+  const [targetAssessment, setTargetAssessment] = useState("Potential brute force campaign detected. Attack pattern resembles credential stuffing behavior. Recommend immediate hybrid key rotation.");
+
+  const [ollamaStatus, setOllamaStatus] = useState('ONLINE (OLLAMA L3)');
+  const [latestThreat, setLatestThreat] = useState<any>(null);
+  const [threatLogs, setThreatLogs] = useState<any[]>([]);
 
   // Counter states for metrics
   const [metrics, setMetrics] = useState({
@@ -87,6 +91,42 @@ export default function Threats() {
     { id: 4, action: "Increase Monitoring Frequency", priority: "LOW", status: "COMPLETED" },
     { id: 5, action: "Terminate Suspicious Sessions", priority: "HIGH", status: "PENDING" }
   ]);
+
+  // Fetch Ollama connection status and latest threats from backend
+  useEffect(() => {
+    const fetchStatusAndThreats = async () => {
+      try {
+        const statusData = await apiFetch('/ai/status');
+        if (statusData) {
+          if (statusData.connected) {
+            setOllamaStatus(`ONLINE (${statusData.model.toUpperCase()})`);
+          } else {
+            setOllamaStatus("OFFLINE (FALLBACK RULES)");
+          }
+        }
+      } catch (err) {
+        console.error("Failed to fetch Ollama status:", err);
+      }
+
+      try {
+        const feedData = await apiFetch('/threats/feed');
+        if (feedData && feedData.length > 0) {
+          setThreatLogs(feedData);
+          const latest = feedData[0];
+          setLatestThreat(latest);
+          if (latest.reasoning) {
+            setTargetAssessment(latest.reasoning);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to fetch threat feed:", err);
+      }
+    };
+
+    fetchStatusAndThreats();
+    const interval = setInterval(fetchStatusAndThreats, 5000);
+    return () => clearInterval(interval);
+  }, []);
 
   // Setup initial events and intervals
   useEffect(() => {
@@ -151,23 +191,21 @@ export default function Threats() {
     };
   }, [attacker]);
 
-  // Handle typing animation
+  // Handle typing animation when targetAssessment changes
+  useEffect(() => {
+    setAssessmentText('');
+    setTypingIndex(0);
+  }, [targetAssessment]);
+
   useEffect(() => {
     if (typingIndex < targetAssessment.length) {
       const timeout = setTimeout(() => {
-        setAssessmentText(prev => prev + targetAssessment[typingIndex]);
+        setAssessmentText(targetAssessment.substring(0, typingIndex + 1));
         setTypingIndex(prev => prev + 1);
       }, 30);
       return () => clearTimeout(timeout);
-    } else {
-      // Loop or restart after a pause to keep UI dynamic
-      const resetTimeout = setTimeout(() => {
-        setAssessmentText('');
-        setTypingIndex(0);
-      }, 15000);
-      return () => clearTimeout(resetTimeout);
     }
-  }, [typingIndex]);
+  }, [typingIndex, targetAssessment]);
 
   // Auto-scroll logic for Live Security Events
   useEffect(() => {
@@ -248,7 +286,7 @@ export default function Threats() {
           <div className="flex items-center gap-3 bg-cyber-card border border-cyber-border px-4 py-2 rounded-xl text-xs font-mono">
             <Radio className="w-4 h-4 text-cyber-accent animate-pulse" />
             <span className="text-cyber-text-secondary">SOC ENGINE:</span>
-            <span className="text-cyber-accent font-bold">ONLINE (OLLAMA L3)</span>
+            <span className="text-cyber-accent font-bold">{ollamaStatus}</span>
           </div>
         </div>
 
@@ -392,7 +430,7 @@ export default function Threats() {
                 AI THREAT REASONING
               </h3>
               <div className="text-[10px] text-cyber-accent font-bold px-2 py-0.5 border border-cyber-accent/30 rounded bg-cyber-accent/10">
-                OLLAMA L3 AGENT
+                {ollamaStatus.startsWith("ONLINE") ? "OLLAMA L3 AGENT" : "FALLBACK RULES"}
               </div>
             </div>
 
@@ -402,12 +440,17 @@ export default function Threats() {
                 <span className="text-[10px] text-cyber-text-secondary uppercase tracking-wider block mb-1">
                   Detected Anomaly Indicators:
                 </span>
-                {[
+                {(latestThreat ? [
+                  `Threat Score: ${Math.round(latestThreat.threat_score * 100)}%`,
+                  `Severity classification: ${latestThreat.severity}`,
+                  `Recommended action: ${latestThreat.action}`,
+                  latestThreat.session_id ? `Target Session: ${latestThreat.session_id.substring(0, 12)}...` : 'Target: Global space'
+                ] : [
                   'Failed login attempts exceeded threshold',
                   'Handshake frequency anomaly detected',
                   'Session creation velocity increased',
                   'Geo-location inconsistency detected'
-                ].map((ind, i) => (
+                ]).map((ind, i) => (
                   <div key={i} className="flex items-center gap-2 text-cyber-accent-yellow">
                     <CheckCircle2 className="w-3.5 h-3.5 text-cyber-accent" />
                     <span>{ind}</span>
@@ -419,10 +462,15 @@ export default function Threats() {
               <div>
                 <div className="flex justify-between text-xs mb-1">
                   <span className="text-cyber-text-secondary">AI CLASSIFICATION CONFIDENCE</span>
-                  <span className="text-cyber-accent font-bold">94%</span>
+                  <span className="text-cyber-accent font-bold">
+                    {latestThreat ? `${Math.round(latestThreat.threat_score * 100)}%` : '94%'}
+                  </span>
                 </div>
                 <div className="w-full bg-cyber-bg h-2 rounded-full overflow-hidden border border-cyber-border">
-                  <div className="bg-cyber-accent h-full rounded-full w-[94%] glow-accent" />
+                  <div 
+                    className="bg-cyber-accent h-full rounded-full glow-accent transition-all duration-500" 
+                    style={{ width: latestThreat ? `${Math.round(latestThreat.threat_score * 100)}%` : '94%' }}
+                  />
                 </div>
               </div>
 
@@ -433,7 +481,7 @@ export default function Threats() {
                   <span className="animate-pulse font-bold ml-0.5 text-cyber-accent">|</span>
                 </div>
                 <div className="text-[9px] text-cyber-text-muted mt-2 border-t border-cyber-border/40 pt-1 flex justify-between">
-                  <span>MODEL: LLAMA3 (8B)</span>
+                  <span>MODEL: {ollamaStatus}</span>
                   <span>LATENCY: 145ms</span>
                 </div>
               </div>

@@ -3,439 +3,879 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cryptographic Mathematics | Quantum-Safe Core</title>
+    <title>Cryptographic Foundations of the Hybrid Quantum-Safe Communication Platform</title>
     
-    <!-- Google Fonts -->
+    <!-- Academic Typography -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;600&family=Inter:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,600;0,700;1,400&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
     
-    <!-- MathJax for rendering LaTeX -->
-    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <!-- KaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css" integrity="sha384-GvrOXuhMATgEsSwCs4smul74iXGOixntILdUW9XmUC6+HX0sLNAK3q71bZ7N5zi+" crossorigin="anonymous">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js" integrity="sha384-cpW21h6RZv/phavutF+AuVYTGqTczm03m1aGFCbEps42WeK76yM5/iU4EunUqTz8" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" integrity="sha384-+VBxd3r6XgURycqtZ117b0lOgwO/mqid+3f/PeZWvW/IohClqE/q1e/S/k103Bbs" crossorigin="anonymous"
+        onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '\\[', right: '\\]', display: true}, {left: '$', right: '$', display: false}, {left: '\\(', right: '\\)', display: false}]});"></script>
 
     <style>
         :root {
-            --bg-color: #0a0a0f;
-            --surface: rgba(20, 20, 30, 0.6);
-            --surface-hover: rgba(30, 30, 45, 0.8);
-            --border: rgba(100, 150, 255, 0.15);
-            --border-highlight: rgba(100, 150, 255, 0.4);
-            --text-primary: #e2e8f0;
-            --text-secondary: #94a3b8;
-            --accent-cyan: #06b6d4;
-            --accent-purple: #8b5cf6;
-            --accent-glow: rgba(6, 182, 212, 0.5);
-            --math-color: #38bdf8;
+            --bg: #ffffff;
+            --text: #111111;
+            --text-light: #444444;
+            --link: #0033aa;
+            --border: #dddddd;
+            --accent: #0055cc;
+            --math-bg: #f9f9f9;
+            --font-main: 'Crimson Pro', Georgia, 'Times New Roman', Times, serif;
+            --font-mono: 'Fira Code', Consolas, Monaco, monospace;
         }
 
         body {
-            background-color: var(--bg-color);
-            color: var(--text-primary);
-            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: var(--font-main);
+            font-size: 1.1rem;
+            line-height: 1.6;
             margin: 0;
             padding: 0;
-            line-height: 1.7;
-            background-image: 
-                radial-gradient(circle at 15% 50%, rgba(6, 182, 212, 0.04), transparent 50%),
-                radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.04), transparent 50%),
-                linear-gradient(to bottom, transparent, rgba(0,0,0,0.8));
-            background-attachment: fixed;
-            min-height: 100vh;
+            display: flex;
+            justify-content: center;
         }
 
-        /* Ambient animated background dots */
-        .bg-grid {
-            position: fixed;
-            top: 0;
-            left: 0;
+        .layout {
+            display: flex;
+            max-width: 1200px;
             width: 100%;
-            height: 100%;
-            background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
-            background-size: 30px 30px;
-            z-index: -1;
+            margin: 0 auto;
+            position: relative;
         }
 
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 4rem 2rem;
+        /* Sticky Navigation */
+        nav {
+            position: sticky;
+            top: 0;
+            width: 280px;
+            height: 100vh;
+            padding: 2rem 1.5rem;
+            border-right: 1px solid var(--border);
+            overflow-y: auto;
+            box-sizing: border-box;
+            background: #fafafa;
+        }
+
+        nav h3 {
+            font-size: 1.2rem;
+            margin-top: 0;
+            margin-bottom: 1rem;
+            color: var(--text);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-family: sans-serif;
+            font-weight: 600;
+        }
+
+        nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        nav li {
+            margin-bottom: 0.75rem;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: var(--text-light);
+            font-family: sans-serif;
+            font-size: 0.9rem;
+            transition: color 0.2s;
+            display: block;
+        }
+
+        nav a:hover {
+            color: var(--accent);
+        }
+
+        /* Main Content */
+        main {
+            flex: 1;
+            padding: 3rem 4rem 5rem 4rem;
+            max-width: 800px;
+            background: var(--bg);
         }
 
         header {
             text-align: center;
-            margin-bottom: 5rem;
-            position: relative;
-        }
-
-        .badge {
-            display: inline-block;
-            padding: 0.25rem 1rem;
-            background: rgba(6, 182, 212, 0.1);
-            color: var(--accent-cyan);
-            border: 1px solid rgba(6, 182, 212, 0.2);
-            border-radius: 9999px;
-            font-size: 0.875rem;
-            font-weight: 500;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-bottom: 1.5rem;
-            backdrop-filter: blur(4px);
+            margin-bottom: 4rem;
+            border-bottom: 2px solid var(--text);
+            padding-bottom: 2rem;
         }
 
         h1 {
-            font-size: 3.5rem;
+            font-size: 2.2rem;
             font-weight: 700;
-            margin: 0;
-            background: linear-gradient(to right, #fff, #94a3b8);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            letter-spacing: -0.02em;
+            margin-bottom: 1rem;
+            line-height: 1.2;
         }
 
-        h1 span {
-            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        header p {
-            color: var(--text-secondary);
-            font-size: 1.25rem;
-            max-width: 600px;
-            margin: 1.5rem auto 0;
-        }
-
-        .section {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 24px;
-            padding: 3rem;
-            margin-bottom: 3rem;
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .section::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
-        }
-
-        .section:hover {
-            transform: translateY(-5px);
-            border-color: var(--border-highlight);
-            box-shadow: 0 30px 60px -12px rgba(6, 182, 212, 0.1);
-        }
-
-        .section-header {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-
-        .section-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.05);
-        }
-
-        .section-icon svg {
-            width: 24px;
-            height: 24px;
-            stroke: var(--accent-cyan);
-            stroke-width: 1.5;
+        .author {
+            font-style: italic;
+            color: var(--text-light);
         }
 
         h2 {
-            font-size: 1.875rem;
+            font-size: 1.5rem;
             font-weight: 600;
-            margin: 0;
-            color: #fff;
+            margin-top: 3.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--text);
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.5rem;
         }
 
-        .math-block {
-            background: rgba(0, 0, 0, 0.4);
-            border-left: 3px solid var(--accent-cyan);
-            padding: 1.5rem;
-            border-radius: 0 12px 12px 0;
-            margin: 2rem 0;
-            font-size: 1.1rem;
-            color: var(--math-color);
-            overflow-x: auto;
-        }
-
-        .math-inline {
-            color: var(--math-color);
-            background: rgba(0,0,0,0.2);
-            padding: 0 0.25rem;
-            border-radius: 4px;
+        h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
         }
 
         p {
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.2rem;
+            text-align: justify;
+            hyphens: auto;
         }
 
-        .code-font {
-            font-family: 'Fira Code', monospace;
-            font-size: 0.9em;
-            color: var(--accent-purple);
-            background: rgba(139, 92, 246, 0.1);
-            padding: 0.2em 0.4em;
+        .equation {
+            display: block;
+            text-align: center;
+            margin: 1.5rem 0;
+            padding: 1rem;
+            background: var(--math-bg);
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+
+        .theorem {
+            border-left: 4px solid var(--text);
+            padding: 1rem 1.5rem;
+            margin: 2rem 0;
+            background: #f4f4f4;
+            font-style: italic;
+        }
+
+        .theorem-title {
+            font-weight: bold;
+            font-style: normal;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 2rem 0;
+            font-family: sans-serif;
+            font-size: 0.95rem;
+        }
+
+        th, td {
+            border: 1px solid var(--border);
+            padding: 0.75rem 1rem;
+            text-align: left;
+        }
+
+        th {
+            background: #f4f4f4;
+            font-weight: 600;
+        }
+
+        /* Visualizations */
+        .viz-container {
+            border: 1px solid var(--border);
+            background: #ffffff;
+            padding: 1rem;
+            margin: 2rem 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
             border-radius: 4px;
         }
 
-        .grid-2 {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 2rem;
-            margin-top: 2rem;
+        .viz-caption {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            margin-top: 1rem;
+            font-style: italic;
+            text-align: center;
         }
 
-        @media (min-width: 768px) {
-            .grid-2 {
-                grid-template-columns: 1fr 1fr;
-            }
+        canvas {
+            max-width: 100%;
+            height: auto;
         }
 
-        .info-card {
-            background: rgba(255,255,255,0.02);
-            border: 1px solid rgba(255,255,255,0.05);
-            padding: 1.5rem;
-            border-radius: 16px;
+        /* SVG Styles */
+        .diagram-svg {
+            width: 100%;
+            height: auto;
+            max-height: 400px;
         }
 
-        .info-card h3 {
-            margin-top: 0;
-            color: #fff;
-            font-size: 1.1rem;
-            margin-bottom: 1rem;
+        /* Buttons for interaction */
+        .controls {
+            margin-top: 1rem;
             display: flex;
-            align-items: center;
-            gap: 0.5rem;
+            gap: 1rem;
+        }
+        
+        button {
+            background: #fff;
+            border: 1px solid var(--border);
+            padding: 0.4rem 1rem;
+            font-family: sans-serif;
+            font-size: 0.85rem;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.2s;
         }
 
-        .info-card h3 svg {
-            width: 18px;
-            height: 18px;
-            stroke: var(--accent-purple);
+        button:hover {
+            background: #f0f0f0;
+            border-color: #999;
         }
 
-        ul {
-            padding-left: 1.5rem;
-            margin-bottom: 1.5rem;
+        .step-container {
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+            background: var(--math-bg);
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+            margin: 1.5rem 0;
+            white-space: pre;
+            overflow-x: auto;
         }
 
-        li {
-            margin-bottom: 0.5rem;
-            color: var(--text-secondary);
-        }
-
-        li strong {
-            color: var(--text-primary);
-        }
-
-        /* Scrollbar styling */
-        ::-webkit-scrollbar {
-            width: 10px;
-            height: 10px;
-        }
-        ::-webkit-scrollbar-track {
-            background: var(--bg-color);
-        }
-        ::-webkit-scrollbar-thumb {
-            background: rgba(255,255,255,0.1);
-            border-radius: 5px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: rgba(255,255,255,0.2);
-        }
     </style>
 </head>
 <body>
 
-    <div class="bg-grid"></div>
-
-    <div class="container">
-        <header>
-            <div class="badge">Mathematical Core</div>
-            <h1>Cryptographic <span>Mathematics</span></h1>
-            <p>A deep dive into the underlying theoretical frameworks of the Hybrid Quantum-Safe Secure Communication Platform.</p>
-        </header>
-
-        <!-- Classical: X25519 -->
-        <div class="section">
-            <div class="section-header">
-                <div class="section-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-                    </svg>
-                </div>
-                <h2>Classical: X25519 (Elliptic Curve)</h2>
-            </div>
-            
-            <p>X25519 uses <strong>Elliptic Curve Diffie-Hellman (ECDH)</strong> over Curve25519. It relies on the computational difficulty of the Elliptic Curve Discrete Logarithm Problem (ECDLP).</p>
-            
-            <p>The curve is defined over a prime field <span class="math-inline">\(\mathbb{F}_p\)</span> by the Montgomery equation:</p>
-            
-            <div class="math-block">
-                \[ y^2 = x^3 + 486662x^2 + x \pmod p \]
-            </div>
-
-            <p>Where the prime <span class="math-inline">\(p\)</span> is defined as:</p>
-
-            <div class="math-block">
-                \[ p = 2^{255} - 19 \]
-            </div>
-
-            <div class="grid-2">
-                <div class="info-card">
-                    <h3>
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-                        Key Exchange Mechanism
-                    </h3>
-                    <p>Alice and Bob agree on a base point <span class="math-inline">\(G\)</span>. They choose private keys <span class="math-inline">\(a\)</span> and <span class="math-inline">\(b\)</span>, generating public keys <span class="math-inline">\(A = aG\)</span> and <span class="math-inline">\(B = bG\)</span>.</p>
-                    <p>The shared secret <span class="math-inline">\(K\)</span> is computed as:</p>
-                    <div class="math-inline" style="padding: 10px; display: inline-block; margin-top: 10px;">
-                        \[ K = aB = a(bG) = b(aG) = bA \]
-                    </div>
-                </div>
-                <div class="info-card">
-                    <h3>
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-                        Vulnerability
-                    </h3>
-                    <p>While extremely fast (~1ms), ECDLP can be solved in polynomial time by a sufficiently large quantum computer using <strong>Shor's Algorithm</strong>, making it vulnerable to "Store-Now-Decrypt-Later" attacks.</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Post-Quantum: ML-KEM-768 -->
-        <div class="section">
-            <div class="section-header">
-                <div class="section-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
-                        <polyline points="2 17 12 22 22 17"></polyline>
-                        <polyline points="2 12 12 17 22 12"></polyline>
-                    </svg>
-                </div>
-                <h2>Post-Quantum: ML-KEM-768 (Lattice-Based)</h2>
-            </div>
-            
-            <p>ML-KEM-768 (formerly CRYSTALS-Kyber) is standardized by NIST (FIPS 203). It is based on the hard problem of <strong>Module Learning with Errors (M-LWE)</strong> over polynomial rings.</p>
-
-            <p>Let <span class="math-inline">\(R_q = \mathbb{Z}_q[X]/(X^n + 1)\)</span> be a polynomial ring where <span class="math-inline">\(n = 256\)</span> and the modulus <span class="math-inline">\(q = 3329\)</span>. For ML-KEM-768, we work with vectors/matrices of dimension <span class="math-inline">\(k = 3\)</span> over <span class="math-inline">\(R_q\)</span>.</p>
-            
-            <p>The core mathematical relationship (the public key generation) is:</p>
-            
-            <div class="math-block">
-                \[ \mathbf{t} = \mathbf{A} \cdot \mathbf{s} + \mathbf{e} \pmod q \]
-            </div>
-
+    <div class="layout">
+        <!-- Navigation -->
+        <nav>
+            <h3>Contents</h3>
             <ul>
-                <li><strong>A</strong>: A randomly generated <span class="math-inline">\(k \times k\)</span> matrix in <span class="math-inline">\(R_q\)</span>.</li>
-                <li><strong>s</strong>: The secret key vector of size <span class="math-inline">\(k\)</span>, sampled from a centered binomial distribution (small coefficients).</li>
-                <li><strong>e</strong>: An error vector of size <span class="math-inline">\(k\)</span>, also sampled from a binomial distribution.</li>
-                <li><strong>t</strong>: The resulting public key vector.</li>
+                <li><a href="#hybrid-arch">1. Hybrid Architecture</a></li>
+                <li><a href="#x25519">2. X25519 Foundation</a></li>
+                <li><a href="#ml-kem">3. ML-KEM-768 Mathematics</a></li>
+                <li><a href="#poly-ring">4. Polynomial Ring Operations</a></li>
+                <li><a href="#ntt">5. NTT Acceleration</a></li>
+                <li><a href="#encap-decap">6. Encapsulation</a></li>
+                <li><a href="#hybrid-deriv">7. Hybrid Derivation</a></li>
+                <li><a href="#hkdf">8. HKDF Mathematics</a></li>
+                <li><a href="#aes">9. AES-256-GCM</a></li>
+                <li><a href="#security">10. Security Analysis</a></li>
             </ul>
+        </nav>
 
-            <div class="grid-2">
-                <div class="info-card">
-                    <h3>
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-                        Security Premise
-                    </h3>
-                    <p>The security relies on the premise that given <span class="math-inline">\(\mathbf{A}\)</span> and <span class="math-inline">\(\mathbf{t}\)</span>, it is computationally intractable (even for quantum computers) to recover the secret <span class="math-inline">\(\mathbf{s}\)</span> due to the deliberate addition of the small error <span class="math-inline">\(\mathbf{e}\)</span>.</p>
-                </div>
-                <div class="info-card">
-                    <h3>
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
-                        Encapsulation
-                    </h3>
-                    <p>During encapsulation, the sender generates a random message <span class="math-inline">\(m\)</span>, an ephemeral secret <span class="math-inline">\(\mathbf{r}\)</span>, and errors <span class="math-inline">\(\mathbf{e_1}\)</span>, <span class="math-inline">\(e_2\)</span>. The ciphertext consists of <span class="math-inline">\((\mathbf{u}, v)\)</span>:</p>
-                    <div class="math-inline" style="padding: 10px; display: inline-block; margin-top: 10px;">
-                        \[ \mathbf{u} = \mathbf{A}^T\mathbf{r} + \mathbf{e_1} \]
-                        \[ v = \mathbf{t}^T\mathbf{r} + e_2 + \lfloor q/2 \rceil \cdot m \]
+        <!-- Main Content -->
+        <main>
+            <header>
+                <h1>Mathematical Foundations of the Hybrid Quantum-Safe Platform</h1>
+                <div class="author">Technical Architecture & Cryptographic Specification</div>
+            </header>
+
+            <!-- 1. Hybrid Key Exchange Architecture -->
+            <section id="hybrid-arch">
+                <h2>1. Hybrid Key Exchange Architecture</h2>
+                <p>The platform implements a dual-layered cryptographic paradigm, intertwining the Elliptic Curve Diffie-Hellman protocol with a lattice-based Key Encapsulation Mechanism. The orchestration of these discrete primitives produces a unified symmetric session key.</p>
+                
+                <div class="viz-container">
+                    <svg class="diagram-svg" viewBox="0 0 600 400" id="arch-svg">
+                        <defs>
+                            <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                                <path d="M 0 0 L 10 5 L 0 10 z" fill="#333" />
+                            </marker>
+                        </defs>
+                        <!-- Nodes -->
+                        <rect x="100" y="50" width="180" height="40" rx="4" fill="#f4f4f4" stroke="#333" stroke-width="1.5"/>
+                        <text x="190" y="75" font-family="sans-serif" font-size="14" text-anchor="middle">X25519 Shared Secret</text>
+                        
+                        <rect x="320" y="50" width="180" height="40" rx="4" fill="#f4f4f4" stroke="#333" stroke-width="1.5"/>
+                        <text x="410" y="75" font-family="sans-serif" font-size="14" text-anchor="middle">ML-KEM Shared Secret</text>
+
+                        <rect x="250" y="150" width="100" height="40" rx="4" fill="#fff" stroke="#333" stroke-dasharray="4" stroke-width="1.5"/>
+                        <text x="300" y="175" font-family="sans-serif" font-size="14" text-anchor="middle">Concatenation</text>
+
+                        <rect x="250" y="240" width="100" height="40" rx="4" fill="#f4f4f4" stroke="#333" stroke-width="1.5"/>
+                        <text x="300" y="265" font-family="sans-serif" font-size="14" text-anchor="middle">HKDF-SHA256</text>
+
+                        <rect x="210" y="330" width="180" height="40" rx="4" fill="#fff" stroke="#333" stroke-width="2"/>
+                        <text x="300" y="355" font-family="sans-serif" font-size="14" font-weight="bold" text-anchor="middle">AES-256 Session Key</text>
+
+                        <!-- Edges -->
+                        <path id="path1" d="M 190 90 L 190 120 L 300 120 L 300 145" fill="none" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+                        <path id="path2" d="M 410 90 L 410 120 L 300 120 L 300 145" fill="none" stroke="#333" stroke-width="1.5"/>
+                        
+                        <line x1="300" y1="190" x2="300" y2="235" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+                        <line x1="300" y1="280" x2="300" y2="325" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+                        <!-- Animation element (Token) -->
+                        <circle id="arch-token" cx="190" cy="90" r="5" fill="#0055cc" opacity="0"/>
+                    </svg>
+                    <div class="controls">
+                        <button onclick="playArchAnimation()">Animate Pipeline</button>
                     </div>
+                    <div class="viz-caption">Figure 1. Cryptographic flow from primitive secrets to symmetric session key.</div>
                 </div>
-            </div>
-        </div>
 
-        <!-- Hybrid Derivation: HKDF -->
-        <div class="section">
-            <div class="section-header">
-                <div class="section-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
-                        <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
-                        <line x1="12" y1="22.08" x2="12" y2="12"></line>
-                    </svg>
+                <script>
+                    function playArchAnimation() {
+                        const token = document.getElementById('arch-token');
+                        token.setAttribute('opacity', '1');
+                        
+                        // X25519 path
+                        token.animate([
+                            { cx: 190, cy: 90 },
+                            { cx: 190, cy: 120 },
+                            { cx: 300, cy: 120 },
+                            { cx: 300, cy: 150 }
+                        ], { duration: 1000, fill: 'forwards' });
+
+                        setTimeout(() => {
+                            // ML-KEM path
+                            token.animate([
+                                { cx: 410, cy: 90 },
+                                { cx: 410, cy: 120 },
+                                { cx: 300, cy: 120 },
+                                { cx: 300, cy: 150 }
+                            ], { duration: 1000, fill: 'forwards' });
+                        }, 1200);
+
+                        setTimeout(() => {
+                            // Down to HKDF
+                            token.animate([
+                                { cx: 300, cy: 150 },
+                                { cx: 300, cy: 240 }
+                            ], { duration: 800, fill: 'forwards' });
+                        }, 2400);
+
+                        setTimeout(() => {
+                            // Down to AES
+                            token.animate([
+                                { cx: 300, cy: 240 },
+                                { cx: 300, cy: 330 }
+                            ], { duration: 800, fill: 'forwards' });
+                        }, 3400);
+                        
+                        setTimeout(() => {
+                            token.setAttribute('opacity', '0');
+                        }, 4400);
+                    }
+                </script>
+            </section>
+
+            <!-- 2. X25519 Mathematical Foundation -->
+            <section id="x25519">
+                <h2>2. X25519 Mathematical Foundation</h2>
+                <p>The classical foundation of the hybrid suite operates over Curve25519, a Montgomery elliptic curve defined over the prime field $\mathbb{F}_p$. The security rests upon the Elliptic Curve Discrete Logarithm Problem (ECDLP).</p>
+                
+                <p>The Curve25519 equation is defined as:</p>
+                <div class="equation">
+                    $$ v^2 = u^3 + 486662u^2 + u \pmod p $$
                 </div>
-                <h2>Hybrid Combining: HKDF-SHA256</h2>
-            </div>
-            
-            <p>To ensure resilience, the secrets from both X25519 (<span class="math-inline">\(S_{ECC}\)</span>) and ML-KEM-768 (<span class="math-inline">\(S_{PQC}\)</span>) are concatenated and fed into an HMAC-based Key Derivation Function (HKDF).</p>
+                <p>where the prime $p$ is uniquely specified as $p = 2^{255} - 19$.</p>
 
-            <p><strong>1. Extract Phase:</strong> Generates a fixed-length pseudorandom key (PRK).</p>
-            <div class="math-block">
-                \[ PRK = \text{HMAC-Hash}(\text{salt}, S_{ECC} \Vert S_{PQC}) \]
-            </div>
+                <p>In the Diffie-Hellman key agreement, a well-defined base point $G$ generates a prime-order subgroup. Operations utilize scalar multiplication. Let $a$ and $b$ represent the ephemeral private scalars for Alice and Bob, respectively.</p>
 
-            <p><strong>2. Expand Phase:</strong> Derives the final 256-bit symmetric session key.</p>
-            <div class="math-block">
-                \[ Key_{session} = \text{HMAC-Hash}(PRK, \text{info} \Vert \text{0x01}) \]
-            </div>
-            
-            <p>Because HKDF is a one-way function, an attacker must break <strong>both</strong> the classical ECDLP and the post-quantum M-LWE problem to recover the session key. If ML-KEM-768 has an unforeseen mathematical vulnerability, X25519 still protects the channel against classical attacks.</p>
-        </div>
-
-        <!-- Symmetric: AES-256-GCM -->
-        <div class="section">
-            <div class="section-header">
-                <div class="section-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                    </svg>
+                <div class="equation">
+                    $$ A = aG $$
+                    $$ B = bG $$
                 </div>
-                <h2>Symmetric Encryption: AES-256-GCM</h2>
-            </div>
-            
-            <p>Once the hybrid handshake generates the session key, real-time WebSocket messages are encrypted client-side using <strong>Advanced Encryption Standard (AES)</strong> in <strong>Galois/Counter Mode (GCM)</strong>.</p>
+                
+                <p>The shared symmetric secret $S$ is derived commutatively:</p>
+                
+                <div class="equation">
+                    $$ S = aB = a(bG) = b(aG) = bA $$
+                </div>
 
-            <p>GCM provides both confidentiality and data origin authentication (AEAD).</p>
+                <div class="viz-container">
+                    <canvas id="curveCanvas" width="500" height="300"></canvas>
+                    <div class="controls">
+                        <button onclick="drawCurve()">Reset Curve</button>
+                        <button onclick="animateScalarMult()">Show Scalar Multiplication</button>
+                    </div>
+                    <div class="viz-caption">Figure 2. Interactive visualization of the Montgomery curve continuous topology over $\mathbb{R}$.</div>
+                </div>
 
-            <p><strong>Encryption (Counter Mode):</strong></p>
-            <div class="math-block">
-                \[ C_i = P_i \oplus E_K(CB_i) \]
-            </div>
-            <p>Where <span class="math-inline">\(P_i\)</span> is plaintext block <span class="math-inline">\(i\)</span>, <span class="math-inline">\(E_K\)</span> is AES encryption with the session key, and <span class="math-inline">\(CB_i\)</span> is the counter block generated from the 12-byte Initialization Vector (IV).</p>
+                <script>
+                    const ctx = document.getElementById('curveCanvas').getContext('2d');
+                    const width = 500;
+                    const height = 300;
+                    
+                    function drawCurve() {
+                        ctx.clearRect(0, 0, width, height);
+                        
+                        // Axes
+                        ctx.beginPath();
+                        ctx.moveTo(0, height/2);
+                        ctx.lineTo(width, height/2);
+                        ctx.moveTo(width/2 + 50, 0);
+                        ctx.lineTo(width/2 + 50, height);
+                        ctx.strokeStyle = '#ccc';
+                        ctx.stroke();
 
-            <p><strong>Authentication (Galois Hash):</strong></p>
-            <p>GCM computes an authentication tag <span class="math-inline">\(T\)</span> by evaluating a polynomial over the Galois field <span class="math-inline">\(GF(2^{128})\)</span>. The ciphertext blocks and any Additional Authenticated Data (AAD) form the coefficients of this polynomial, which is evaluated at a hash subkey <span class="math-inline">\(H = E_K(0^{128})\)</span>.</p>
-            
-            <div class="math-block">
-                \[ T = (\text{GHASH}_H(A, C) \oplus E_K(CB_0)) \]
-            </div>
+                        // Curve y^2 = x^3 + Ax^2 + x (simplified scaling for viz)
+                        ctx.beginPath();
+                        ctx.strokeStyle = '#0055cc';
+                        ctx.lineWidth = 2;
+                        
+                        for(let x = -10; x <= 10; x += 0.05) {
+                            let scaledX = x;
+                            let y2 = Math.pow(scaledX, 3) + 2*Math.pow(scaledX, 2) + scaledX; // simplified A
+                            
+                            if (y2 >= 0) {
+                                let y = Math.sqrt(y2);
+                                let plotX = (width/2 + 50) + x * 20;
+                                let plotY = height/2 - y * 20;
+                                ctx.lineTo(plotX, plotY);
+                            }
+                        }
+                        ctx.stroke();
 
-            <p>This 16-byte tag ensures that any tampering with the ciphertext in transit across the WebSocket relay is immediately detected, causing the decryption to fail.</p>
-        </div>
+                        ctx.beginPath();
+                        for(let x = 10; x >= -10; x -= 0.05) {
+                            let scaledX = x;
+                            let y2 = Math.pow(scaledX, 3) + 2*Math.pow(scaledX, 2) + scaledX;
+                            
+                            if (y2 >= 0) {
+                                let y = -Math.sqrt(y2);
+                                let plotX = (width/2 + 50) + x * 20;
+                                let plotY = height/2 - y * 20;
+                                ctx.lineTo(plotX, plotY);
+                            }
+                        }
+                        ctx.stroke();
+                    }
 
+                    function animateScalarMult() {
+                        drawCurve();
+                        let p1X = (width/2 + 50) + (-0.5) * 20;
+                        let p1Y = height/2 - Math.sqrt(Math.pow(-0.5, 3) + 2*Math.pow(-0.5, 2) + (-0.5)) * 20;
+                        
+                        // Draw point G
+                        ctx.beginPath();
+                        ctx.arc(p1X, p1Y, 5, 0, 2*Math.PI);
+                        ctx.fillStyle = '#ff0000';
+                        ctx.fill();
+                        ctx.fillText("G", p1X - 15, p1Y - 10);
+                        
+                        // Draw tangent/intersection
+                        setTimeout(() => {
+                            ctx.beginPath();
+                            ctx.moveTo(p1X - 50, p1Y + 30);
+                            ctx.lineTo(p1X + 150, p1Y - 90);
+                            ctx.strokeStyle = '#ff0000';
+                            ctx.stroke();
+                            
+                            // Intersection point
+                            let intX = (width/2 + 50) + 1.8 * 20;
+                            let intY = height/2 - Math.sqrt(Math.pow(1.8, 3) + 2*Math.pow(1.8, 2) + 1.8) * 20;
+                            
+                            ctx.beginPath();
+                            ctx.arc(intX, intY, 5, 0, 2*Math.PI);
+                            ctx.fill();
+                            
+                            // Reflection (2G)
+                            setTimeout(() => {
+                                ctx.beginPath();
+                                ctx.setLineDash([5, 5]);
+                                ctx.moveTo(intX, intY);
+                                ctx.lineTo(intX, height/2 + (height/2 - intY));
+                                ctx.stroke();
+                                ctx.setLineDash([]);
+                                
+                                ctx.beginPath();
+                                ctx.arc(intX, height/2 + (height/2 - intY), 5, 0, 2*Math.PI);
+                                ctx.fill();
+                                ctx.fillText("2G", intX + 10, height/2 + (height/2 - intY) + 10);
+                            }, 500);
+                            
+                        }, 500);
+                    }
+                    drawCurve();
+                </script>
+            </section>
+
+            <!-- 3. ML-KEM-768 Mathematics -->
+            <section id="ml-kem">
+                <h2>3. ML-KEM-768 Mathematics</h2>
+                <p>The post-quantum mechanism, ML-KEM-768, derives its security bounds from the Module Learning with Errors (M-LWE) problem. In this paradigm, discovering a secret vector in the presence of noise is computationally intractable, effectively resisting Shor's algorithm.</p>
+                
+                <p>The fundamental M-LWE relation generating the public key $\mathbf{t}$ is:</p>
+                <div class="equation">
+                    $$ \mathbf{A} \cdot \mathbf{s} + \mathbf{e} = \mathbf{t} \pmod q $$
+                </div>
+
+                <p>Where the components are defined as:</p>
+                <ul>
+                    <li>$\mathbf{A} \in R_q^{k \times k}$: A uniformly random matrix of polynomials.</li>
+                    <li>$\mathbf{s} \in R_q^k$: The secret key vector, with coefficients sampled from a centered binomial distribution $B_\eta$.</li>
+                    <li>$\mathbf{e} \in R_q^k$: An error vector, similarly sampled from $B_\eta$, critical for the hardness of the problem.</li>
+                </ul>
+
+                <p>The addition of the small error $\mathbf{e}$ forces the system into an approximate linear state. Gaussian elimination yields exponentially vast solution spaces, securing $\mathbf{s}$.</p>
+
+                <div class="viz-container">
+                    <canvas id="latticeCanvas" width="500" height="300"></canvas>
+                    <div class="controls">
+                        <button onclick="drawLattice(false)">Show Perfect Lattice ($\mathbf{A \cdot s}$)</button>
+                        <button onclick="drawLattice(true)">Inject Error ($\mathbf{+ e}$)</button>
+                    </div>
+                    <div class="viz-caption">Figure 3. 2D projection of lattice points. The addition of noise disrupts exact lattice intersection algorithms.</div>
+                </div>
+
+                <script>
+                    const latCtx = document.getElementById('latticeCanvas').getContext('2d');
+                    function drawLattice(withError) {
+                        latCtx.clearRect(0, 0, 500, 300);
+                        
+                        let originX = 250;
+                        let originY = 150;
+                        let v1 = {x: 40, y: 15};
+                        let v2 = {x: -10, y: 35};
+                        
+                        // Draw lattice grid
+                        latCtx.fillStyle = '#aaa';
+                        for(let i = -6; i <= 6; i++) {
+                            for(let j = -6; j <= 6; j++) {
+                                let px = originX + i*v1.x + j*v2.x;
+                                let py = originY + i*v1.y + j*v2.y;
+                                
+                                latCtx.beginPath();
+                                latCtx.arc(px, py, 2, 0, 2*Math.PI);
+                                latCtx.fill();
+                            }
+                        }
+
+                        // Target point
+                        let targetI = 2;
+                        let targetJ = 1;
+                        let tx = originX + targetI*v1.x + targetJ*v2.x;
+                        let ty = originY + targetI*v1.y + targetJ*v2.y;
+
+                        // Error offset
+                        let ex = withError ? 12 : 0;
+                        let ey = withError ? -8 : 0;
+
+                        // Draw vector As
+                        latCtx.beginPath();
+                        latCtx.moveTo(originX, originY);
+                        latCtx.lineTo(tx, ty);
+                        latCtx.strokeStyle = '#0055cc';
+                        latCtx.lineWidth = 2;
+                        latCtx.stroke();
+                        
+                        if(withError) {
+                            // Draw error vector e
+                            latCtx.beginPath();
+                            latCtx.moveTo(tx, ty);
+                            latCtx.lineTo(tx + ex, ty + ey);
+                            latCtx.strokeStyle = '#cc0000';
+                            latCtx.stroke();
+                            
+                            // Draw point b
+                            latCtx.beginPath();
+                            latCtx.arc(tx + ex, ty + ey, 4, 0, 2*Math.PI);
+                            latCtx.fillStyle = '#cc0000';
+                            latCtx.fill();
+                            latCtx.fillText("b = As + e", tx + ex + 10, ty + ey - 10);
+                        } else {
+                            latCtx.beginPath();
+                            latCtx.arc(tx, ty, 4, 0, 2*Math.PI);
+                            latCtx.fillStyle = '#0055cc';
+                            latCtx.fill();
+                            latCtx.fillText("As", tx + 10, ty - 10);
+                        }
+                    }
+                    drawLattice(false);
+                </script>
+            </section>
+
+            <!-- 4. Polynomial Ring Operations -->
+            <section id="poly-ring">
+                <h2>4. Polynomial Ring Operations</h2>
+                <p>The mathematical structure underpinning the M-LWE vectors is the polynomial quotient ring:</p>
+                <div class="equation">
+                    $$ R_q = \mathbb{Z}_q[x]/(x^n+1) $$
+                </div>
+                <p>where $n = 256$ is the degree polynomial, and $q = 3329$ is the prime modulus. Computations within this ring involve strict modular reductions at two discrete levels.</p>
+
+                <p><strong>Multiplication Process:</strong></p>
+                <ol>
+                    <li>Multiply standard polynomials: $C(x) = A(x) \cdot B(x)$</li>
+                    <li><strong>Degree Reduction:</strong> Apply the rule $x^n \equiv -1 \pmod{x^n+1}$. Any term $c_k x^k$ where $k \ge 256$ is mapped to $-c_k x^{k-256}$.</li>
+                    <li><strong>Coefficient Reduction:</strong> For every coefficient $c_i$, compute $c_i \pmod q$.</li>
+                </ol>
+
+                <div class="step-container">Step-by-step example (for n=4, q=17):
+A(x) = 2x³ + 4x + 1
+B(x) = 3x² + 5
+
+1. Standard Multiplication:
+C(x) = A(x) * B(x)
+     = 6x⁵ + 10x³ + 12x³ + 20x + 3x² + 5
+     = 6x⁵ + 22x³ + 3x² + 20x + 5
+
+2. Degree Reduction (x⁴ ≡ -1):
+6x⁵ = 6x(x⁴) ≡ -6x
+C'(x) = 22x³ + 3x² + (20x - 6x) + 5
+      = 22x³ + 3x² + 14x + 5
+
+3. Coefficient Reduction (mod 17):
+22 ≡ 5 (mod 17)
+C_final(x) = 5x³ + 3x² + 14x + 5</div>
+            </section>
+
+            <!-- 5. NTT Acceleration -->
+            <section id="ntt">
+                <h2>5. Number Theoretic Transform (NTT) Acceleration</h2>
+                <p>Naive polynomial multiplication in $R_q$ requires $\mathcal{O}(n^2)$ coefficient multiplications. ML-KEM enforces the use of the Number Theoretic Transform (a discrete Fourier transform analog over a finite field) to map polynomials to the NTT domain.</p>
+
+                <div class="equation">
+                    $$ \text{NTT}(A \cdot B) = \text{NTT}(A) \circ \text{NTT}(B) $$
+                </div>
+                
+                <p>Pointwise multiplication in the NTT domain reduces the computational complexity to $\mathcal{O}(n \log n)$. Because $q = 3329 \equiv 1 \pmod{256}$, the field contains the necessary $256^{th}$ primitive roots of unity $\zeta$.</p>
+
+                <div class="viz-container">
+                    <canvas id="nttCanvas" width="500" height="250"></canvas>
+                    <div class="controls">
+                        <button onclick="drawComplexity()">Visualize Complexity</button>
+                    </div>
+                    <div class="viz-caption">Figure 4. Growth of operation count: Naive $\mathcal{O}(n^2)$ vs NTT $\mathcal{O}(n \log n)$.</div>
+                </div>
+
+                <script>
+                    const nttCtx = document.getElementById('nttCanvas').getContext('2d');
+                    function drawComplexity() {
+                        nttCtx.clearRect(0, 0, 500, 250);
+                        
+                        // Axes
+                        nttCtx.beginPath();
+                        nttCtx.moveTo(40, 210);
+                        nttCtx.lineTo(480, 210);
+                        nttCtx.moveTo(40, 210);
+                        nttCtx.lineTo(40, 20);
+                        nttCtx.strokeStyle = '#333';
+                        nttCtx.stroke();
+                        nttCtx.fillText("Degree (n)", 430, 230);
+                        nttCtx.fillText("Ops", 10, 30);
+
+                        // Animate O(n^2)
+                        let i = 0;
+                        function step() {
+                            if (i > 100) return;
+                            
+                            let n = i;
+                            let n2 = (n*n) / 50; // scaled
+                            let nlogn = (n * Math.log2(n+1)) / 5; // scaled
+
+                            let x = 40 + n * 4;
+                            let y2 = 210 - n2;
+                            let y1 = 210 - nlogn;
+
+                            nttCtx.fillStyle = '#cc0000';
+                            nttCtx.fillRect(x, Math.max(20, y2), 2, 2);
+                            
+                            nttCtx.fillStyle = '#0055cc';
+                            nttCtx.fillRect(x, Math.max(20, y1), 2, 2);
+
+                            i+=2;
+                            requestAnimationFrame(step);
+                        }
+                        step();
+                        
+                        nttCtx.fillStyle = '#cc0000';
+                        nttCtx.fillText("O(n²)", 350, 40);
+                        nttCtx.fillStyle = '#0055cc';
+                        nttCtx.fillText("O(n log n)", 400, 150);
+                    }
+                    drawComplexity();
+                </script>
+            </section>
+
+            <!-- 6. ML-KEM Encapsulation & Decapsulation -->
+            <section id="encap-decap">
+                <h2>6. ML-KEM Encapsulation & Decapsulation</h2>
+                <p>The core KEM functionality requires asymmetric generation and symmetric extraction. The mathematical formulations are defined as follows:</p>
+
+                <h3>Encapsulation (Sender)</h3>
+                <p>The sender generates a uniform random message $m \in \{0,1\}^{256}$ and an ephemeral secret vector $\mathbf{r}$, alongside error vectors $\mathbf{e_1}$ and $e_2$. The ciphertext $c = (\mathbf{u}, v)$ is computed over the public key $\mathbf{t}$:</p>
+                <div class="equation">
+                    $$ \mathbf{u} = \text{NTT}^{-1}(\text{NTT}(\mathbf{A}^T) \circ \text{NTT}(\mathbf{r})) + \mathbf{e_1} $$
+                    $$ v = \text{NTT}^{-1}(\text{NTT}(\mathbf{t}^T) \circ \text{NTT}(\mathbf{r})) + e_2 + \lfloor \frac{q}{2} \rceil \cdot m $$
+                </div>
+
+                <h3>Decapsulation (Receiver)</h3>
+                <p>The receiver utilizes the private key $\mathbf{s}$ to strip the public matrix parameters, extracting the noisy message, which is then rounded to recover $m$:</p>
+                <div class="equation">
+                    $$ m' = \text{Compress}(v - \mathbf{s}^T \mathbf{u}) $$
+                </div>
+                <p><strong>Proof of correctness:</strong></p>
+                <div class="equation" style="font-size: 0.9em; text-align: left; padding-left: 2rem;">
+                    $ v - \mathbf{s}^T \mathbf{u} $<br>
+                    $ = (\mathbf{t}^T\mathbf{r} + e_2 + \lfloor \frac{q}{2} \rceil m) - \mathbf{s}^T(\mathbf{A}^T\mathbf{r} + \mathbf{e_1}) $<br>
+                    $ = ((\mathbf{A}\mathbf{s} + \mathbf{e})^T\mathbf{r} + e_2 + \lfloor \frac{q}{2} \rceil m) - (\mathbf{s}^T\mathbf{A}^T\mathbf{r} + \mathbf{s}^T\mathbf{e_1}) $<br>
+                    $ = \mathbf{s}^T\mathbf{A}^T\mathbf{r} + \mathbf{e}^T\mathbf{r} + e_2 + \lfloor \frac{q}{2} \rceil m - \mathbf{s}^T\mathbf{A}^T\mathbf{r} - \mathbf{s}^T\mathbf{e_1} $<br>
+                    $ = \lfloor \frac{q}{2} \rceil m + (\mathbf{e}^T\mathbf{r} + e_2 - \mathbf{s}^T\mathbf{e_1}) $
+                </div>
+                <p>Because the term $(\mathbf{e}^T\mathbf{r} + e_2 - \mathbf{s}^T\mathbf{e_1})$ consists entirely of small error coefficients, it is vastly smaller than $\lfloor q/2 \rceil$. The compression/rounding function safely discards this noise, leaving the exact bitstring $m$.</p>
+            </section>
+
+            <!-- 7. Hybrid Secret Derivation -->
+            <section id="hybrid-deriv">
+                <h2>7. Hybrid Secret Derivation</h2>
+                <p>The outputs of the independent classical and post-quantum phases are the raw symmetric secrets $S_{ECC}$ and $S_{PQC}$. The platform synthesizes these matrices to ensure absolute entropy preservation.</p>
+
+                <div class="equation">
+                    $$ S = S_{ECC} \parallel S_{PQC} $$
+                    $$ K = \text{HKDF}(S) $$
+                </div>
+                
+                <div class="viz-container">
+                    <canvas id="entropyCanvas" width="600" height="100"></canvas>
+                    <div class="viz-caption">Figure 5. Concatenation and deterministic extraction of uniformly distributed entropy.</div>
+                </div>
+
+                <script>
+                    const entCtx = document.getElementById('entropyCanvas').getContext('2d');
+                    
+                    function drawEntropy() {
+                        // S_ECC
+                        for(let i=0; i<150; i+=5) {
+                            entCtx.fillStyle = Math.random() > 0.5 ? '#0055cc' : '#ffffff';
+                            entCtx.fillRect(50 + i, 20, 5, 20);
+                        }
+                        entCtx.strokeRect(50, 20, 150, 20);
+                        entCtx.fillStyle = '#000';
+                        entCtx.fillText("S_{ECC}", 100, 15);
+
+                        // S_PQC
+                        for(let i=0; i<150; i+=5) {
+                            entCtx.fillStyle = Math.random() > 0.5 ? '#cc0000' : '#ffffff';
+                            entCtx.fillRect(210 + i, 20, 5, 20);
+                        }
+                        entCtx.strokeRect(210, 20, 150, 20);
+                        entCtx.fillText("S_{PQC}", 260, 15);
+
+                        // Arrow
+                        entCtx.beginPath();
+                        entCtx.moveTo(205, 50);
+                        entCtx.lineTo(205, 70);
+                        entCtx.stroke();
+
+                        // K
+                        for(let i=0; i<256; i+=4) {
+                            // Mixed entropy colors
+                            let r = Math.floor(Math.random() * 255);
+                            let b = Math.floor(Math.random() * 255);
+                            entCtx.fillStyle = `rgb(${r}, 0, ${b})`;
+                            entCtx.fillRect(75 + i, 70, 4, 20);
+                        }
+                        entCtx.strokeRect(75, 70, 256, 20);
+                        entCtx.fillStyle = '#000';
+                        entCtx.fillText("K = HKDF(S)", 170, 105);
+                    }
+                    drawEntropy();
+                </script>
+            </section>
+
+            <!-- 8. HKDF Mathematics -->
+            <section id="hkdf">
+                <h2>8. HKDF Mathematics</h2>
+                <p>The HMAC-based Extract-and-Expand Key Derivation Function (RFC 5869) rigorously processes the concatenated input key material (IKM).</p>
+
+                <p><strong>Extract Phase:</strong> Homogenizes the dispersion of entropy from the inputs to produce a fixed-length pseudorandom key (PRK).</p>
+                <div class="equation">
+                    $$ \text{PRK} = \text{HMAC-SHA256}(\text{Salt}, \text{IKM}) $$
+                </div>
+
+                <p><strong>Expand Phase:</strong> Deterministically expands the PRK into the cryptographically robust Output Keying Material (OKM) mapping to the 256-bit space required by AES.</p>
+                <div class="equation">
+                    $$ \text{OKM} = \text{HMAC-SHA256}(\text{PRK}, \text{Info} \parallel \text{0x01}) $$
+                </div>
+            </section>
+
+            <!-- 9. AES-256-GCM Mathematics -->
+            <section id="aes">
+                <h2>9. AES-256-GCM Mathematics</h2>
+                <p>The final communication streams are encrypted utilizing the derived session key via AES-256 operating in Galois/Counter Mode (GCM). This provides Authenticated Encryption with Associated Data (AEAD).</p>
+
+                <p><strong>Confidentiality (Counter Mode):</strong></p>
+                <p>A 96-bit Initialization Vector (IV) initializes a counter. Successive counter blocks are encrypted and XORed with the plaintext.</p>
+                <div class="equation">
+                    $$ C_i = P_i \oplus E_K(IV \parallel \text{counter}_i) $$
+                </div>
+
+                <p><strong>Integrity & Authentication (GHASH):</strong></p>
+                <p>A hash subkey $H = E_K(0^{128})$ defines an evaluation point over the Galois field $\text{GF}(2^{128})$. A polynomial is constructed where the coefficients are the ciphertext blocks and associated data, generating the authentication tag.</p>
+                <div class="equation">
+                    $$ \text{Tag} = \text{GHASH}_H(A, C) \oplus E_K(IV \parallel 0^{31}1) $$
+                </div>
+            </section>
+
+            <!-- 10. Security Analysis -->
+            <section id="security">
+                <h2>10. Security Analysis</h2>
+                
+                <div class="theorem">
+                    <span class="theorem-title">Theorem 1. (Hybrid Security Guarantee)</span>
+                    If either the Elliptic Curve Discrete Logarithm Problem (ECDLP) underlying X25519 remains classically secure, OR the Module Learning with Errors (M-LWE) problem underlying ML-KEM-768 remains quantumly secure, then the derived session key $K$ remains computationally indistinguishable from true randomness.
+                </div>
+
+                <p>This formal reduction proves that the hybrid paradigm acts as a strict structural upgrade without introducing degradation. The matrix mapping below specifies operational resilience paradigms against theoretical state actors.</p>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Algorithm Primitive</th>
+                            <th>Classical Security Bound</th>
+                            <th>Quantum Security Bound</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>RSA-2048</td>
+                            <td>High</td>
+                            <td>Broken (Shor's)</td>
+                        </tr>
+                        <tr>
+                            <td>ECC (General)</td>
+                            <td>High</td>
+                            <td>Broken (Shor's)</td>
+                        </tr>
+                        <tr>
+                            <td>X25519</td>
+                            <td>High (128-bit level)</td>
+                            <td>Broken (Shor's)</td>
+                        </tr>
+                        <tr>
+                            <td>ML-KEM-768</td>
+                            <td>High (AES-192 equiv)</td>
+                            <td>Resistant (No known poly-time quantum attack)</td>
+                        </tr>
+                        <tr style="font-weight: bold; background: #f9f9f9;">
+                            <td>Hybrid Suite</td>
+                            <td>Maximum Overlap</td>
+                            <td>Resistant</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+        </main>
     </div>
 
 </body>
