@@ -1,74 +1,83 @@
-# AI-Driven Quantum-Safe Secure Communication Platform (Thesis Simulation Mode)
+# AI-Driven Quantum-Safe Secure Communication Platform
 
-A research demonstration showcasing a hybrid quantum-safe Key Encapsulation Mechanism (KEM) secure communication platform. The system combines classical elliptic curve cryptography (X25519) with post-quantum lattice cryptography (ML-KEM-768) to protect channels, with AI-driven threat analysis and active rotation protocols.
+A research demonstration showcasing a hybrid quantum-safe Secure Key Encapsulation Mechanism (KEM) communication platform. The system combines classical elliptic curve cryptography (**X25519**) with post-quantum lattice cryptography (**ML-KEM-768**) to secure transmission channels, utilizing real-time WebSockets and an **AI-driven Key Management & Threat Detection engine** running on local LLMs.
 
-## Architecture Overview
+---
 
-```
-                   +------------------------------+
-                   |       React/Next.js UI       |
-                   |      (Port 3000 Front)       |
-                   +--------------+---------------+
-                                  |
-            REST APIs & WebSockets| (Real-time Encrypted Chat)
-                                  v
-                   +------------------------------+
-                   |       FastAPI Backend        |
-                   |      (Port 8000 Engine)      |
-                   +-------+--------------+-------+
-                           |              |
-                   SQLite  |              | Ollama AI Agent API
-             (quantum_comm)|              | (Port 11434, llama3)
-                           v              v
-                   +---------------+      +---------------+
-                   | SQLite DB Local|     |  Ollama Core  |
-                   +---------------+      +---------------+
-```
+## 🚀 Quick Start & Setup
 
-## Prerequisites
+For a deep dive into the implementation, inner workings, and complete catalog, please refer to the detailed [DEMO.md](file:///home/tankaizokuo/Code/AI-Driven%20Quantum-Safe%20Secure%20Communication%20Platform/DEMO.md) guide.
 
-1. **Python 3.12+**
-2. **Node.js 18+** & **npm**
-3. **Ollama** installed on host machine (auto-fallback to rule-based model if offline).
-   - Pull the model: `ollama pull llama3` or `ollama pull mistral`
+### Prerequisites
+- **Python 3.12+**
+- **Node.js 18+** & **npm**
+- **Ollama** installed on the host machine (Run `ollama pull llama3` or `ollama pull mistral` to download local models).
 
-## Setup & Running
+### Option A: Manual Setup
 
-### Option A: Using Docker Compose
-Simply run:
-```bash
-docker-compose up --build
-```
-- Frontend: `http://localhost:3000`
-- Backend API: `http://localhost:8000`
-
-### Option B: Manual Development Setup
-
-1. **Backend**:
+1. **FastAPI Backend**:
    ```bash
-   uv venv
+   python3 -m venv .venv
    source .venv/bin/activate
-   uv pip install -r backend/requirements.txt
-   uvicorn backend.main:app --reload --port 8000
+   pip install -r backend/requirements.txt
+   uvicorn backend.main:app --reload --port 8001
    ```
+   *Backend Swagger Docs: `http://localhost:8001/docs`*
 
-2. **Frontend**:
+2. **Next.js Frontend**:
    ```bash
    cd frontend
    npm install
    npm run dev
    ```
-   Open `http://localhost:3000`
+   *Frontend Dashboard: `http://localhost:3000`*
 
-## Demonstration Walkthrough
+### Option B: Docker Compose
+```bash
+docker-compose up --build
+```
 
-1. **Register/Login**: Access the secure operations terminal credentials.
-2. **Hybrid KEM Handshake**: Create a channel to observe the step-by-step key encapsulation animation, showing individual times and output public/private key hex strings.
-3. **Encrypted Chat**: Send messages over WebSockets to inspect the instant client-side encryption and GCM cipher tags.
-4. **Benchmarking**: Run comparison suites showing latency results across multiple network profiles (Normal, WAN, Mobile, Adverse) rendered in Recharts.
-5. **Research Runner**: Run the scripted simulation execution sequence to compile final performance scores for thesis verification, including downloading a browser-printable PDF report.
+---
 
-## Non-Goals & Simulation Boundaries
-- **No real liboqs**: Cryptographic operations, key generation times, and resulting hex strings are fully simulated using real-world performance baseline bounds to ensure ease of deployment.
-- **SQLite Database**: Designed to be lightweight and zero-config.
-- **Local LLM**: Integrated via Ollama HTTP API with robust rule-based local fail-safes.
+## 🛠️ Architecture & System Structure
+
+```
+                    +------------------------------+
+                    |       React/Next.js UI       |
+                    |      (Port 3000 Front)       |
+                    +--------------+---------------+
+                                   |
+             REST APIs & WebSockets| (Real-time Encrypted Chat)
+                                   v
+                    +------------------------------+
+                    |       FastAPI Backend        |
+                    |      (Port 8001 Engine)      |
+                    +-------+--------------+-------+
+                            |              |
+                    SQLite  |              | Ollama AI Agent API
+              (quantum_comm)|              | (Port 11434, llama3)
+                            v              v
+                    +---------------+      +---------------+
+                    | SQLite DB Local|     |  Ollama Core  |
+                    | (quantum_comm)|      | (Local LLM)   |
+                    +---------------+      +---------------+
+```
+
+### Component Overview
+- **`backend/`**: Built on FastAPI. Manages REST endpoints, SQLite databases, and establishes WebSocket connections at `/ws/{session_id}`.
+- **`backend/simulation/`**: Houses simulation wrappers for hybrid handshakes (`crypto_sim.py`), network profiles (`network_sim.py`), and anomalies (`anomaly_sim.py`).
+- **`backend/ai/`**: Links backend anomalies and metrics to local Ollama LLMs with high-fidelity rules as fallbacks.
+- **`frontend/`**: Interactive dashboard presenting cryptographic benchmarks, real-time message encryption telemetry, and an interactive Cyber Range Topology simulator (`app/experiment`).
+
+---
+
+## 🔒 Cryptographic Mechanics (Under the Hood)
+
+The platform secures channels using a **Hybrid Key Encapsulation Mechanism**:
+
+1. **Dual Key Generation**: Key pairs are generated for both classical **X25519** and post-quantum **ML-KEM-768** algorithms.
+2. **Key Encapsulation / Decapsulation**: Client and server exchange and decapsulate public parameters to extract raw secrets.
+3. **HKDF Derivation**: Secrets are combined using **HKDF-SHA256** to derive a 256-bit symmetric session key.
+4. **Symmetric Encryption**: Individual chat messages are encrypted client-side using **AES-256-GCM**, transmitting the ciphertext along with `iv` and authentication `tag` markers.
+
+For detailed sequence diagrams, mathematical formulas, and simulation thresholds, view [DEMO.md](file:///home/tankaizokuo/Code/AI-Driven%20Quantum-Safe%20Secure%20Communication%20Platform/DEMO.md).

@@ -2,9 +2,19 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session as DBSession
 from pydantic import BaseModel
 from backend.models.database import get_db, ThreatLog
-from backend.ai.ollama_client import predict_key_rotation, analyze_anomaly
+from backend.ai.ollama_client import predict_key_rotation, analyze_anomaly, check_ollama_connection
 
 router = APIRouter()
+
+@router.get("/ai/status")
+async def get_ai_status():
+    connected, model = await check_ollama_connection()
+    return {
+        "connected": connected,
+        "model": model,
+        "status": f"Active ({model})" if connected else "Offline (Simulated Fallback)"
+    }
+
 
 class KeyRotationSchema(BaseModel):
     age_days: int

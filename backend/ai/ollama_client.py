@@ -129,3 +129,18 @@ Logs: {json.dumps(session_logs)}
         "action": action,
         "reasoning": reasoning
     }
+
+async def check_ollama_connection() -> tuple[bool, str]:
+    try:
+        async with httpx.AsyncClient(timeout=2.0) as client:
+            response = await client.get(f"{OLLAMA_URL}/api/tags")
+            if response.status_code == 200:
+                data = response.json()
+                models = data.get("models", [])
+                if models:
+                    return True, models[0]["name"]
+                return True, "Unknown"
+    except Exception:
+        pass
+    return False, "llama3"
+
