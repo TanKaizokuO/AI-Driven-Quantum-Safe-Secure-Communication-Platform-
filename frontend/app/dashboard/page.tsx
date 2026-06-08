@@ -35,8 +35,23 @@ export default function Dashboard() {
     }
     setLoading(false);
 
+    const fetchOllamaStatus = async () => {
+      try {
+        const data = await apiFetch('/ai/status');
+        if (data && data.status) {
+          setStats((prev) => ({ ...prev, ollamaStatus: data.status }));
+        }
+      } catch (err) {
+        // Fallback to placeholder/backup
+        setStats((prev) => ({ ...prev, ollamaStatus: 'Active (llama3)' }));
+      }
+    };
+
+    fetchOllamaStatus();
+
     // Poll to update stats slightly and simulate life
     const interval = setInterval(() => {
+      fetchOllamaStatus();
       setStats((prev) => ({
         ...prev,
         activeSessions: prev.activeSessions + (Math.random() > 0.5 ? 1 : -1),
